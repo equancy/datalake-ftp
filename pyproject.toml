@@ -1,0 +1,43 @@
+[tool.poetry]
+authors = ["Didier SCHMITT <dschmitt@equancy.com>"]
+description = "Moves files from FTP drop folders to a Cloud Bucket"
+license = "MIT"
+name = "datalake-ftp"
+readme = "README.md"
+repository = "https://git.equancy.cloud/equancy/data-technologies/datalake-ftp"
+version = "1.0.0-alpha.0"
+
+[tool.poetry.dependencies]
+PyYAML = "^6.0"
+click = "^8.0.3"
+datalake-framework = "^1.0.0"
+pendulum = "^2.1.2"
+python = "^3.8"
+
+[tool.poetry.dev-dependencies]
+black = "^22.1.0"
+coverage = "^6.3.2"
+flake9 = "^3.8.3"
+pytest = "^7.0.1"
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]
+
+[tool.flake8]
+ignore = "E501,W503"
+
+[tool.black]
+line-length = 125
+target-version = ["py38"]
+
+[tool.coverage.report]
+omit = ["tests/*"]
+
+[tool.poetry.scripts]
+ftp2cloud = "datalake_ftp.main:cli"
+
+[tool.pytest.ini_options]
+addopts = "-ra -v --no-header"
+minversion = "6.0"
+testpaths = ["tests"]
