@@ -37,6 +37,7 @@ def ftp_dir(temp_dir):
     utime(join(temp_dir, "alice/INPUT/global.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/domain/2049_domain.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
+    utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (now().int_timestamp, now().int_timestamp))
 
     return temp_dir
 
@@ -111,6 +112,7 @@ def test_scan_files(ftp_cloud):
 def test_prepare(ftp_cloud):
     ftp_dir = Path(ftp_cloud.ftp_dir)
     assert (ftp_dir / Path("alice/INPUT/global.xml")).is_file()
+    assert not (ftp_dir / Path("alice/LANDING")).is_dir()
     assert not (ftp_dir / Path("alice/LANDING/global.xml")).is_file()
     ftp_cloud.move_to(Path("alice/INPUT/global.xml"), "LANDING")
     assert not (ftp_dir / Path("alice/INPUT/global.xml")).is_file()
@@ -157,9 +159,10 @@ def test_lambda1(ftp_cloud, test_id):
     assert cloud.exists(f"ftp-{test_id}/alice/LANDING/domain/2049_domain.xml")
 
 
-@pytest.mark.clamav()
+@pytest.mark.clamav
 def test_antivirus(ftp_cloudav, test_id, caplog):
     ftp_dir = Path(ftp_cloudav.ftp_dir)
+    ftp_cloudav.move_to(Path("alice/INPUT/eicar.com.txt"), "LANDING")
     cloud = Storage(S3_BUCKET)
     assert (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
     assert not (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
