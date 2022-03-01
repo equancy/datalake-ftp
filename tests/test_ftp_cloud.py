@@ -30,8 +30,13 @@ def ftp_dir(temp_dir):
 
     d30 = now().subtract(seconds=30).int_timestamp
     d80 = now().subtract(seconds=80).int_timestamp
+    d600 = now().subtract(seconds=600).int_timestamp
+    utime(join(temp_dir, "bob/INPUT/data-1.csv"), (d600, d600))
     utime(join(temp_dir, "bob/INPUT/data-2.csv"), (d80, d80))
     utime(join(temp_dir, "bob/INPUT/data-3.csv"), (d30, d30))
+    utime(join(temp_dir, "alice/INPUT/global.xml"), (d600, d600))
+    utime(join(temp_dir, "alice/INPUT/domain/2049_domain.xml"), (d600, d600))
+    utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
 
     return temp_dir
 
