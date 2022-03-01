@@ -5,7 +5,7 @@ license = "MIT"
 name = "datalake-ftp"
 readme = "README.md"
 repository = "https://git.equancy.cloud/equancy/data-technologies/datalake-ftp"
-version = "1.0.0"
+version = "1.0.1"
 
 [tool.poetry.dependencies]
 PyYAML = "^6.0"
