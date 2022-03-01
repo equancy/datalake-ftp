@@ -41,3 +41,6 @@ ftpcloud = "datalake_ftp.cli:main"
 addopts = "-ra -v --no-header"
 minversion = "6.0"
 testpaths = ["tests"]
+markers = [
+    "clamav: marks tests requiring a ClamAV daemon"
+]

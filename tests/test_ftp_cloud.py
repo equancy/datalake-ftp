@@ -61,6 +61,30 @@ def ftp_cloud(ftp_dir, test_id):
     return FTPCloud(config)
 
 
+@pytest.fixture(scope="module")
+def ftp_cloudav(ftp_dir, test_id):
+    config = {
+        "cloud": {
+            "bucket": S3_BUCKET,
+            "prefix": f"ftp-{test_id}",
+            "provider": "aws",
+            "monitoring": {
+                "class": "NoMonitor",
+                "params": {
+                    "quiet": False,
+                },
+            },
+        },
+        "ftp_dir": ftp_dir,
+        "antivirus": {
+            "enabled": True,
+            "params": "--config-file tests/clamd.conf --stream"
+        },
+    }
+
+    return FTPCloud(config)
+
+
 def test_scan_files(ftp_cloud):
     l = [str(i) for i in ftp_cloud.scan_folder("INPUT", 120)]
     assert len(l) == 4
@@ -87,7 +111,6 @@ def test_scan_files(ftp_cloud):
 def test_prepare(ftp_cloud):
     ftp_dir = Path(ftp_cloud.ftp_dir)
     assert (ftp_dir / Path("alice/INPUT/global.xml")).is_file()
-    assert not (ftp_dir / Path("alice/LANDING")).is_dir()
     assert not (ftp_dir / Path("alice/LANDING/global.xml")).is_file()
     ftp_cloud.move_to(Path("alice/INPUT/global.xml"), "LANDING")
     assert not (ftp_dir / Path("alice/INPUT/global.xml")).is_file()
@@ -132,3 +155,18 @@ def test_lambda1(ftp_cloud, test_id):
     assert (ftp_dir / Path("alice/ARCHIVE/domain/2049_domain.xml")).is_file()
     assert cloud.exists(f"ftp-{test_id}/bob/LANDING/data-1.csv")
     assert cloud.exists(f"ftp-{test_id}/alice/LANDING/domain/2049_domain.xml")
+
+
+@pytest.mark.clamav()
+def test_antivirus(ftp_cloudav, test_id, caplog):
+    ftp_dir = Path(ftp_cloudav.ftp_dir)
+    cloud = Storage(S3_BUCKET)
+    assert (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
+    assert not (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
+    assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/eicar.com.txt")
+    ftp_cloudav.lambda1()
+    assert not (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
+    assert (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
+    assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/eicar.com.txt")
+    assert caplog.records[0].levelname == "WARNING"
+    assert "EICAR" in caplog.text

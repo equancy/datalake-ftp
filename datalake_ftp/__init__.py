@@ -40,6 +40,7 @@ class FTPCloud:
             "archive_retention_hours": 24,
             "antivirus": {
                 "enabled": False,
+                "params": ""
             },
         }
         self._config.update(config)
@@ -111,23 +112,23 @@ class FTPCloud:
             metric = Measurement("ftpcloud-delivered")
             metric.add_labels({"file_path": str(file_to_move)})
             metric.add_measure("file_size", self.full_path(file_to_move).stat().st_size)
-
+            file_path = str(self._ftp_dir / file_to_move)
             try:
                 is_safe = True
                 if self._config["antivirus"]["enabled"]:
                     clamav = run(
-                        f"clamdscan --no-summary --fdpass {file_to_scan}",
+                        f"clamdscan --no-summary {self._config['antivirus']['params']} {file_path}",
                         shell=True,
                         text=True,
                         capture_output=True,
                     )
-                    status = clamav.stdout.replace(f"{file_to_scan}: ", "")
+                    status = clamav.stdout.replace(f"{file_path}: ", "")
                     if clamav.returncode == 0:
                         is_safe = True
                     elif clamav.returncode == 1:
                         metric.add_label("virus_name", status)
                         metric.add_label("status", STATUS_INFECTED)
-                        self._logger.warn(f"Virus detected in file {files_to_move}: {status}")
+                        self._logger.warning(f"Virus detected in file '{str(file_to_move)}': {status}")
                         is_safe = False
                     else:
                         raise IOError(clamav.stderr)
@@ -148,7 +149,7 @@ class FTPCloud:
                 else:
                     self.move_to(file_to_move, self._config["quarantine_folder"])
             except Exception as e:
-                self._logger.error(f"An error occured whilst delivering {files_to_move}: {str(e)}")
+                self._logger.error(f"An error occured whilst delivering '{str(file_to_move)}': {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
             self._services.monitor.push(metric)
