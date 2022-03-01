@@ -127,7 +127,7 @@ class FTPCloud:
                         metric.add_label("status", STATUS_INFECTED)
                         self._logger.warning(f"Virus detected in file '{str(file_to_move)}': {status}")
                         is_safe = False
-                    else:
+                    else: # pragma: no cover
                         raise IOError(clamav.stderr)
 
                 if is_safe:
@@ -145,7 +145,7 @@ class FTPCloud:
                     metric.add_label("status", STATUS_SUCCESS)
                 else:
                     self.move_to(file_to_move, self._config["quarantine_folder"])
-            except Exception as e:
+            except Exception as e: # pragma: no cover
                 self._logger.error(f"An error occured whilst delivering '{str(file_to_move)}': {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 

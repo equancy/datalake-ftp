@@ -38,6 +38,7 @@ def ftp_dir(temp_dir):
     utime(join(temp_dir, "alice/INPUT/domain/2049_domain.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (now().int_timestamp, now().int_timestamp))
+    utime(join(temp_dir, "alice/INPUT/lorem.txt"), (now().int_timestamp, now().int_timestamp))
 
     return temp_dir
 
@@ -163,13 +164,18 @@ def test_lambda1(ftp_cloud, test_id):
 def test_antivirus(ftp_cloudav, test_id, caplog):
     ftp_dir = Path(ftp_cloudav.ftp_dir)
     ftp_cloudav.move_to(Path("alice/INPUT/eicar.com.txt"), "LANDING")
+    ftp_cloudav.move_to(Path("alice/INPUT/lorem.txt"), "LANDING")
     cloud = Storage(S3_BUCKET)
     assert (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
+    assert (ftp_dir / Path("alice/LANDING/lorem.txt")).is_file()
     assert not (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
     assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/eicar.com.txt")
     ftp_cloudav.lambda1()
     assert not (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
+    assert not (ftp_dir / Path("alice/LANDING/lorem.txt")).is_file()
     assert (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
+    assert not (ftp_dir / Path("alice/QUARANTINE/lorem.txt")).is_file()
     assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/eicar.com.txt")
+    assert cloud.exists(f"ftp-{test_id}/alice/LANDING/lorem.txt")
     assert caplog.records[0].levelname == "WARNING"
     assert "EICAR" in caplog.text
