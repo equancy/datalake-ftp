@@ -18,7 +18,7 @@ class FTPCloud:
     def __init__(self, config={}):
         self._logger = getLogger(f"{__name__}.{__class__.__name__}")
 
-        if not isinstance(config, dict):
+        if not isinstance(config, dict): # pragma: no cover
             raise ValueError("FTPCloud configuration must be a dict")
 
         self._config = {
@@ -38,10 +38,7 @@ class FTPCloud:
             "quarantine_folder": "QUARANTINE",
             "move_age_seconds": 180,
             "archive_retention_hours": 24,
-            "antivirus": {
-                "enabled": False,
-                "params": ""
-            },
+            "antivirus": {"enabled": False, "params": ""},
         }
         self._config.update(config)
 
@@ -100,7 +97,7 @@ class FTPCloud:
             try:
                 self.move_to(file_to_move, self._config["deliver_folder"])
                 metric.add_label("status", STATUS_SUCCESS)
-            except Exception as e:
+            except Exception as e:  # pragma: no cover
                 self._logger.error(f"An error occured whilst moving {files_to_move}: {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
@@ -135,8 +132,8 @@ class FTPCloud:
 
                 if is_safe:
                     bucket = self._services.get_storage(self._config["cloud"]["bucket"])
-                    if self._config["cloud"]["prefix"] is None:
-                        target_path = str(files_to_move)
+                    if self._config["cloud"]["prefix"] is None: # pragma: no cover
+                        target_path = str(file_to_move)
                     else:
                         target_path = join(self._config["cloud"]["prefix"], str(file_to_move))
                     bucket.upload(

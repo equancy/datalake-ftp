@@ -22,7 +22,7 @@ pytest:
   - poetry install --quiet
   script:
   - poetry run coverage run -m pytest -q --color=no
-  - poetry run coverage report
+  - poetry run coverage report -m
 
 python-build:
   stage: Python Build
