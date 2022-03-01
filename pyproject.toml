@@ -10,7 +10,7 @@ version = "1.0.0-alpha.0"
 [tool.poetry.dependencies]
 PyYAML = "^6.0"
 click = "^8.0.3"
-datalake-framework = "^1.0.0"
+datalake-framework = "^1.0.1"
 pendulum = "^2.1.2"
 python = "^3.8"
 
@@ -35,7 +35,7 @@ target-version = ["py38"]
 omit = ["tests/*"]
 
 [tool.poetry.scripts]
-ftp2cloud = "datalake_ftp.main:cli"
+ftpcloud = "datalake_ftp.cli:main"
 
 [tool.pytest.ini_options]
 addopts = "-ra -v --no-header"
