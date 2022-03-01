@@ -28,6 +28,7 @@ def temp_dir():
 def ftp_dir(temp_dir):
     copytree("./tests/ftp", temp_dir, dirs_exist_ok=True)
 
+    d10 = now().subtract(seconds=10).int_timestamp
     d30 = now().subtract(seconds=30).int_timestamp
     d80 = now().subtract(seconds=80).int_timestamp
     d600 = now().subtract(seconds=600).int_timestamp
@@ -37,8 +38,8 @@ def ftp_dir(temp_dir):
     utime(join(temp_dir, "alice/INPUT/global.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/domain/2049_domain.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
-    utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (now().int_timestamp, now().int_timestamp))
-    utime(join(temp_dir, "alice/INPUT/lorem.txt"), (now().int_timestamp, now().int_timestamp))
+    utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (d10, d10))
+    utime(join(temp_dir, "alice/INPUT/lorem.txt"), (d10, d10))
 
     return temp_dir
 
@@ -150,7 +151,7 @@ def test_lambda1(ftp_cloud, test_id):
     assert not (ftp_dir / Path("bob/ARCHIVE/data-1.csv")).is_file()
     assert not (ftp_dir / Path("alice/ARCHIVE/domain/2049_domain.xml")).is_file()
     assert not cloud.exists(f"ftp-{test_id}/bob/LANDING/data-1.csv")
-    assert not cloud.exists(f"ftp-{test_id}/alice/ARCHIVE/domain/2049_domain.xml")
+    assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/domain/2049_domain.xml")
     ftp_cloud.lambda1()
     assert not (ftp_dir / Path("bob/LANDING/data-1.csv")).is_file()
     assert not (ftp_dir / Path("alice/LANDING/domain/2049_domain.xml")).is_file()
@@ -169,7 +170,9 @@ def test_antivirus(ftp_cloudav, test_id, caplog):
     assert (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
     assert (ftp_dir / Path("alice/LANDING/lorem.txt")).is_file()
     assert not (ftp_dir / Path("alice/QUARANTINE/eicar.com.txt")).is_file()
+    assert not (ftp_dir / Path("alice/QUARANTINE/lorem.txt")).is_file()
     assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/eicar.com.txt")
+    assert not cloud.exists(f"ftp-{test_id}/alice/LANDING/lorem.txt")
     ftp_cloudav.lambda1()
     assert not (ftp_dir / Path("alice/LANDING/eicar.com.txt")).is_file()
     assert not (ftp_dir / Path("alice/LANDING/lorem.txt")).is_file()
