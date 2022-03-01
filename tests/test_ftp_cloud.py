@@ -32,6 +32,7 @@ def ftp_dir(temp_dir):
     d30 = now().subtract(seconds=30).int_timestamp
     d80 = now().subtract(seconds=80).int_timestamp
     d600 = now().subtract(seconds=600).int_timestamp
+    h48 = now().subtract(hours=48).int_timestamp
     utime(join(temp_dir, "bob/INPUT/data-1.csv"), (d600, d600))
     utime(join(temp_dir, "bob/INPUT/data-2.csv"), (d80, d80))
     utime(join(temp_dir, "bob/INPUT/data-3.csv"), (d30, d30))
@@ -40,6 +41,7 @@ def ftp_dir(temp_dir):
     utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (d10, d10))
     utime(join(temp_dir, "alice/INPUT/lorem.txt"), (d10, d10))
+    utime(join(temp_dir, "jose/ARCHIVE/oldie.txt"), (h48, h48))
 
     return temp_dir
 
@@ -79,10 +81,7 @@ def ftp_cloudav(ftp_dir, test_id):
             },
         },
         "ftp_dir": ftp_dir,
-        "antivirus": {
-            "enabled": True,
-            "params": "--config-file tests/clamd.conf --stream"
-        },
+        "antivirus": {"enabled": True, "params": "--config-file tests/clamd.conf --stream"},
     }
 
     return FTPCloud(config)
@@ -182,3 +181,14 @@ def test_antivirus(ftp_cloudav, test_id, caplog):
     assert cloud.exists(f"ftp-{test_id}/alice/LANDING/lorem.txt")
     assert caplog.records[0].levelname == "WARNING"
     assert "EICAR" in caplog.text
+
+
+def test_delta24(ftp_cloud):
+    ftp_dir = Path(ftp_cloud.ftp_dir)
+    assert (ftp_dir / Path("jose/ARCHIVE/oldie.txt")).is_file()
+    assert (ftp_dir / Path("bob/ARCHIVE/data-1.csv")).is_file()
+    assert (ftp_dir / Path("alice/ARCHIVE/domain/2049_domain.xml")).is_file()
+    ftp_cloud.delta24()
+    assert not (ftp_dir / Path("jose/ARCHIVE/oldie.txt")).is_file()
+    assert (ftp_dir / Path("bob/ARCHIVE/data-1.csv")).is_file()
+    assert (ftp_dir / Path("alice/ARCHIVE/domain/2049_domain.xml")).is_file()

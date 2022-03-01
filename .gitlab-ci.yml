@@ -13,7 +13,6 @@ pytest:
     CLAMAV_NO_CLAMD: "false"
     CLAMAV_NO_FRESHCLAMD: "true"
     CLAMAV_NO_MILTERD: "true"
-
   services:
     - alias: clamav
       name: clamav/clamav:0.104.0

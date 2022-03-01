@@ -18,7 +18,7 @@ class FTPCloud:
     def __init__(self, config={}):
         self._logger = getLogger(f"{__name__}.{__class__.__name__}")
 
-        if not isinstance(config, dict): # pragma: no cover
+        if not isinstance(config, dict):  # pragma: no cover
             raise ValueError("FTPCloud configuration must be a dict")
 
         self._config = {
@@ -38,7 +38,10 @@ class FTPCloud:
             "quarantine_folder": "QUARANTINE",
             "move_age_seconds": 180,
             "archive_retention_hours": 24,
-            "antivirus": {"enabled": False, "params": ""},
+            "antivirus": {
+                "enabled": False,
+                "params": "",
+            },
         }
         self._config.update(config)
 
@@ -98,7 +101,7 @@ class FTPCloud:
                 self.move_to(file_to_move, self._config["deliver_folder"])
                 metric.add_label("status", STATUS_SUCCESS)
             except Exception as e:  # pragma: no cover
-                self._logger.error(f"An error occured whilst moving {files_to_move}: {str(e)}")
+                self._logger.error(f"An error occured whilst moving {str(file_to_move)}: {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
             self._services.monitor.push(metric)
@@ -127,12 +130,12 @@ class FTPCloud:
                         metric.add_label("status", STATUS_INFECTED)
                         self._logger.warning(f"Virus detected in file '{str(file_to_move)}': {status}")
                         is_safe = False
-                    else: # pragma: no cover
+                    else:  # pragma: no cover
                         raise IOError(clamav.stderr)
 
                 if is_safe:
                     bucket = self._services.get_storage(self._config["cloud"]["bucket"])
-                    if self._config["cloud"]["prefix"] is None: # pragma: no cover
+                    if self._config["cloud"]["prefix"] is None:  # pragma: no cover
                         target_path = str(file_to_move)
                     else:
                         target_path = join(self._config["cloud"]["prefix"], str(file_to_move))
@@ -145,8 +148,20 @@ class FTPCloud:
                     metric.add_label("status", STATUS_SUCCESS)
                 else:
                     self.move_to(file_to_move, self._config["quarantine_folder"])
-            except Exception as e: # pragma: no cover
+            except Exception as e:  # pragma: no cover
                 self._logger.error(f"An error occured whilst delivering '{str(file_to_move)}': {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
             self._services.monitor.push(metric)
+
+    def delta24(self):
+        files_to_move = self.scan_folder(
+            folder=self._config["archive_folder"],
+            min_age=self._config["archive_retention_hours"] * 60 * 60,
+        )
+        for file_to_move in files_to_move:
+            try:
+                self._logger.info(f"Purging file {str(file_to_move)}")
+                (self._ftp_dir / file_to_move).unlink()
+            except Exception as e:  # pragma: no cover
+                self._logger.warning(f"An error occured whilst purging {str(file_to_move)}: {str(e)}")

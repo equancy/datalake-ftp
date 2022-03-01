@@ -8,6 +8,3 @@ import click
 def main(daemon, config):
     cfg = yaml.safe_load(config)
     ftp_cloud = FTPCloud(cfg)
-    
-    # delta.24
-    ## cleanup delivered, quarantine
