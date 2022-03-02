@@ -104,7 +104,7 @@ class FTPCloud:
                 self._logger.error(f"An error occured whilst moving {str(file_to_move)}: {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
-            self._services.monitor.push(metric)
+            self._services.monitor.safe_push(metric)
 
     def lambda1(self):
         files_to_move = self.scan_folder(folder=self._config["deliver_folder"], min_age=0)
@@ -152,7 +152,7 @@ class FTPCloud:
                 self._logger.error(f"An error occured whilst delivering '{str(file_to_move)}': {str(e)}")
                 metric.add_label("status", STATUS_ERROR)
 
-            self._services.monitor.push(metric)
+            self._services.monitor.safe_push(metric)
 
     def delta24(self):
         files_to_move = self.scan_folder(

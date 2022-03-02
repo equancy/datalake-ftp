@@ -54,11 +54,11 @@ uamqp = ">=1.5.1,<2.0.0"
 
 [[package]]
 name = "azure-identity"
-version = "1.7.1"
+version = "1.8.0"
 description = "Microsoft Azure Identity Library for Python"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.6"
 
 [package.dependencies]
 azure-core = ">=1.11.0,<2.0.0"
@@ -128,14 +128,14 @@ uvloop = ["uvloop (>=0.15.2)"]
 
 [[package]]
 name = "boto3"
-version = "1.21.8"
+version = "1.21.10"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.6"
 
 [package.dependencies]
-botocore = ">=1.24.8,<1.25.0"
+botocore = ">=1.24.10,<1.25.0"
 jmespath = ">=0.7.1,<1.0.0"
 s3transfer = ">=0.5.0,<0.6.0"
 
@@ -144,7 +144,7 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "botocore"
-version = "1.24.8"
+version = "1.24.10"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -247,7 +247,7 @@ test = ["pytest (>=6.2.0)", "pytest-cov", "pytest-subtests", "pytest-xdist", "pr
 
 [[package]]
 name = "datalake-framework"
-version = "1.0.1"
+version = "1.0.2"
 description = "Datalake Framework"
 category = "main"
 optional = false
@@ -338,7 +338,7 @@ grpc = ["grpcio (>=1.8.2,<2.0dev)"]
 
 [[package]]
 name = "google-cloud-monitoring"
-version = "2.8.0"
+version = "2.9.0"
 description = "Stackdriver Monitoring API client library"
 category = "main"
 optional = false
@@ -368,7 +368,7 @@ proto-plus = ">=1.7.1"
 
 [[package]]
 name = "google-cloud-secret-manager"
-version = "2.8.0"
+version = "2.9.0"
 description = "Secret Manager API API client library"
 category = "main"
 optional = false
@@ -377,8 +377,10 @@ python-versions = ">=3.6"
 [package.dependencies]
 google-api-core = {version = ">=1.28.0,<3.0.0dev", extras = ["grpc"]}
 grpc-google-iam-v1 = ">=0.12.3,<0.13dev"
-libcst = ">=0.2.5"
 proto-plus = ">=1.4.0"
+
+[package.extras]
+libcst = ["libcst (>=0.2.5)"]
 
 [[package]]
 name = "google-cloud-storage"
@@ -989,7 +991,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "9aec1b981f4494c9a9e2d6ab25e073965247223e4778bb1dce4d905219757d49"
+content-hash = "cce7f39c5305ff0bb4afc687bc09bf9cc156437934b2be8f7ccd898f8e6567ec"
 
 [metadata.files]
 atomicwrites = [
@@ -1013,8 +1015,8 @@ azure-eventhub = [
     {file = "azure_eventhub-5.7.0-py3-none-any.whl", hash = "sha256:e04fba74494196f28fd350c583a73d4b62082e83dee24bbf67d0394f0618fa74"},
 ]
 azure-identity = [
-    {file = "azure-identity-1.7.1.zip", hash = "sha256:7f22cd0c7a9b92ed297dd67ae79d9bb9a866e404061c02cec709ad10c4c88e19"},
-    {file = "azure_identity-1.7.1-py2.py3-none-any.whl", hash = "sha256:454e16ed1152b4fd3fb463f4b4e2f7a3fc3a862b0ca28010bff6d5c6b2b0c50f"},
+    {file = "azure-identity-1.8.0.zip", hash = "sha256:020ff0e47157852e4aac8a3adb06841827147f27a94cbe74a904425d8e62d93c"},
+    {file = "azure_identity-1.8.0-py3-none-any.whl", hash = "sha256:8d87aff09b8dabe3c99bb934798dcdeb2f2d49614ecc4f0425cc888faafd64ae"},
 ]
 azure-keyvault-secrets = [
     {file = "azure-keyvault-secrets-4.3.0.zip", hash = "sha256:26279ba3a6c727deba1fb61f549496867baddffbf062bd579d6fd2bc04e95276"},
@@ -1054,12 +1056,12 @@ black = [
     {file = "black-22.1.0.tar.gz", hash = "sha256:a7c0192d35635f6fc1174be575cb7915e92e5dd629ee79fdaf0dcfa41a80afb5"},
 ]
 boto3 = [
-    {file = "boto3-1.21.8-py3-none-any.whl", hash = "sha256:9b6903fe9cc92d2f6111db28675263f1ab45adbcf1483025c82a304ce7790b71"},
-    {file = "boto3-1.21.8.tar.gz", hash = "sha256:f2ce641957c1782e382548ced4a447189e45851bbe58c1f6752ff2b661527de7"},
+    {file = "boto3-1.21.10-py3-none-any.whl", hash = "sha256:0122f8428a23efd29283c9ec92e7da1a8f35a69ddfd0635131cc5ca558723c4f"},
+    {file = "boto3-1.21.10.tar.gz", hash = "sha256:365156a9e55f08f2394e0bc84fc953f2a200f63adb08091c2ea06d7b025ea80b"},
 ]
 botocore = [
-    {file = "botocore-1.24.8-py3-none-any.whl", hash = "sha256:9fbc5c57b31850c51c87abc3e166ed4e0f343665bec4e1a0ff814fbc9704642c"},
-    {file = "botocore-1.24.8.tar.gz", hash = "sha256:a5431d806dc75fb1844463d921759fcd8d387674443af8d7fd0867f296b02759"},
+    {file = "botocore-1.24.10-py3-none-any.whl", hash = "sha256:fc4bf1c71fabd84c35b7fb728268a6f9f491493e9ee7a5efb603425bfe8a0277"},
+    {file = "botocore-1.24.10.tar.gz", hash = "sha256:7429f6e54851d3f40fa9147ca1517f5f54101865ae4e79ba2095f580ff85333e"},
 ]
 cachetools = [
     {file = "cachetools-5.0.0-py3-none-any.whl", hash = "sha256:8fecd4203a38af17928be7b90689d8083603073622229ca7077b72d8e5a976e4"},
@@ -1199,8 +1201,8 @@ cryptography = [
     {file = "cryptography-36.0.1.tar.gz", hash = "sha256:53e5c1dc3d7a953de055d77bef2ff607ceef7a2aac0353b5d630ab67f7423638"},
 ]
 datalake-framework = [
-    {file = "datalake-framework-1.0.1.tar.gz", hash = "sha256:273e25bed9eabc5fe5f576215f74b6c862b7b1bfcf86bf598949ac61b957b430"},
-    {file = "datalake_framework-1.0.1-py3-none-any.whl", hash = "sha256:d4082bfd22305380cf7178840f1b4a40af1cc1d4d88b5826fb11e3bfc57ee4e9"},
+    {file = "datalake-framework-1.0.2.tar.gz", hash = "sha256:5b951f0038a2b492daf75629c72998ad8e20cc5da12b5ba1af52b08004fc3f8d"},
+    {file = "datalake_framework-1.0.2-py3-none-any.whl", hash = "sha256:d756048e256ba2ab8e37a46be1a1e2cbe21c71bb8f300c9b7e80303cec60dbff"},
 ]
 flake9 = [
     {file = "flake9-3.8.3.post2-py3-none-any.whl", hash = "sha256:47dced969a802a8892740bcaa35ae07232709b2ade803c45f48dd03ccb7f825f"},
@@ -1219,16 +1221,16 @@ google-cloud-core = [
     {file = "google_cloud_core-2.2.2-py2.py3-none-any.whl", hash = "sha256:d9cffaf86df6a876438d4e8471183bbe404c9a15de9afe60433bc7dce8cb4252"},
 ]
 google-cloud-monitoring = [
-    {file = "google-cloud-monitoring-2.8.0.tar.gz", hash = "sha256:2a25f7535f21cdeabfccb07fe4a75eae5a47bb36b82025537755b37d3376da46"},
-    {file = "google_cloud_monitoring-2.8.0-py2.py3-none-any.whl", hash = "sha256:2d2ff53e5cc3ca2063dfb990377407c8905b0a9094a0aae32709d23c1e5d372f"},
+    {file = "google-cloud-monitoring-2.9.0.tar.gz", hash = "sha256:e97bb4ed006b54640ec318bae4a65a605285dc327fd6e73ecc2f8d50aa897963"},
+    {file = "google_cloud_monitoring-2.9.0-py2.py3-none-any.whl", hash = "sha256:fcecbc7bb87d0fc085c63624f5fbd9114e5a6fc6e97d2baf963f46c7e47ce406"},
 ]
 google-cloud-pubsub = [
     {file = "google-cloud-pubsub-2.9.0.tar.gz", hash = "sha256:2b3d9336afab0e5df67201234976519a28da3ccb7c9a0e463be28e2827a9fdaa"},
     {file = "google_cloud_pubsub-2.9.0-py2.py3-none-any.whl", hash = "sha256:f303a0e8fba3b8d0beccc84d6282ae4864cf40c9cd9431ae7ca4a3191309a10c"},
 ]
 google-cloud-secret-manager = [
-    {file = "google-cloud-secret-manager-2.8.0.tar.gz", hash = "sha256:e8a3fb7c2a1595f59923661c568667d1ba40fcaaa4dd55fe8b1f5e54871e9460"},
-    {file = "google_cloud_secret_manager-2.8.0-py2.py3-none-any.whl", hash = "sha256:af6a8f3aeb5939020cd71deafbbb21744d74b988cef8e0690ebff828302ce13f"},
+    {file = "google-cloud-secret-manager-2.9.0.tar.gz", hash = "sha256:1b6bf2863da96cdcb0184dbf413c8dbe261039cb008f8291f2f21c1a1bcce5ef"},
+    {file = "google_cloud_secret_manager-2.9.0-py2.py3-none-any.whl", hash = "sha256:dafe09531a83b457f740f4cc50dc20a04e0ccef99020e338944499fdb72aca84"},
 ]
 google-cloud-storage = [
     {file = "google-cloud-storage-1.44.0.tar.gz", hash = "sha256:29edbfeedd157d853049302bf5d104055c6f0cb7ef283537da3ce3f730073001"},

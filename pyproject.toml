@@ -10,7 +10,7 @@ version = "1.0.1"
 [tool.poetry.dependencies]
 PyYAML = "^6.0"
 click = "^8.0.3"
-datalake-framework = "^1.0.1"
+datalake-framework = "^1.0.2"
 pendulum = "^2.1.2"
 python = "^3.8"
 
