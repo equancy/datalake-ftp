@@ -1,3 +1,94 @@
-# Datalake File Transfer
+# Datalake FTP
 
 Moves files from FTP drop folders to a Cloud Bucket.
+
+## How it works
+
+In the following FTP folder hierarchy, there are two users **bob** and **alice**. 
+Each users have four subfolders `INPUT`, `LANDING`, `ARCHIVE` and `QUARANTINE`.
+
+```plaintext
+/ftp/home/
+|-- bob/
+|   |-- INPUT/
+|   |-- LANDING/
+|   |-- ARCHIVE/
+|   `-- QUARANTINE/
+`-- alice/
+    |-- INPUT/
+    |-- LANDING/
+    |-- ARCHIVE/
+    `-- QUARANTINE/
+```
+
+The goal is to synchronize all files the FTP users put in the `INPUT` folder with a cloud bucket ([AWS S3](https://aws.amazon.com/s3/), [Google Cloud Storage](https://cloud.google.com/storage/) or [Azure BlobStorage](https://azure.microsoft.com/en-us/services/storage/blobs/)).
+To ensure a file is completely uploaded, its modification time must be _old enough_, like 3 minutes.
+The synchronization process is split in the following steps:
+
+1. Select files ready for synchronization: a file is selected if it is in the `INPUT` folder (or one of its subfolders) and if it is older than 3 minutes (according to the last modification time). 
+Selected files are moved to the `LANDING` folder.
+
+2. **Optional** Scan files for malwares and viruses: all files in the `LANDING` folder are scanned with [ClamAV antivirus](https://www.clamav.net/).
+Infected files are moved to the `QUARANTINE` folder.
+
+3. Copy files to the cloud bucket: all files in the `LANDING` folder are copied along with their subfolders in a target bucket. Files successfully copied are then moved to the `ARCHIVE` folder.
+
+4. Clean up files after retention period: all files older than 72 hours (according to last modification time) are removed from the folders `ARCHIVE` and `QUARANTINE`
+     
+
+## Installation
+
+Install the package using pip
+
+```shell
+pip install datalake-ftp
+```
+
+The following command executes a synchronization with a provided configuration file
+
+```shell
+ftpcloud -c 'path/to/config.yaml'
+```
+
+The command can be configured as a Linux service. 
+For example using systemd:
+
+```ini
+[Unit]
+Description=Datalake File Transfer
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/usr/local/bin/ftpcloud --daemon --config /etc/datalake-ftp/config.yml
+Restart=always
+User=datalake
+Group=sftp
+
+[Install]
+WantedBy=multi-user.target
+```
+
+
+## Configuration
+
+Configuration file is in YAML format.
+the following options are available:
+
+
+| Option | Description | Default value |
+| ------ | ----------- | ------------- |
+| `ftp_dir` | The parent folder for all FTP users | "/ftp/home" |
+| `drop_folder` | The name for the `INPUT` folder | "INPUT" |
+| `deliver_folder` | The name for the `LANDING` folder | "LANDING" |
+| `archive_folder` | The name for the `ARCHIVE` folder | "ARCHIVE" |
+| `quarantine_folder` | The name for the `QUARANTINE` folder | "QUARANTINE" |
+| `move_age_seconds` | The age threshold in seconds for selecting files for synchronization | 180 |
+| `archive_retention_hours` | The retention period in hours for archived and quarantined files | 72 |
+| `cloud.bucket` | The name of the target bucket | "." |
+| `cloud.prefix` | The prefix to append to file names before copying to the bucket. | "" |
+| `cloud.provider` | The cloud provider for the bucket (either "aws", "gcp", "azure" or "local")| "local" |
+| `cloud.monitoring` | The monitoring configuration | `NoMonitor` |
+| `antivirus.enabled` | The flag to enable antivirus scanning | `false` |
+| `antivirus.params` | Optional arguments to pass to `clamdscan` command | "" |

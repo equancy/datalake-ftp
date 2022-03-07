@@ -32,7 +32,7 @@ def ftp_dir(temp_dir):
     d30 = now().subtract(seconds=30).int_timestamp
     d80 = now().subtract(seconds=80).int_timestamp
     d600 = now().subtract(seconds=600).int_timestamp
-    h48 = now().subtract(hours=48).int_timestamp
+    h80 = now().subtract(hours=80).int_timestamp
     utime(join(temp_dir, "bob/INPUT/data-1.csv"), (d600, d600))
     utime(join(temp_dir, "bob/INPUT/data-2.csv"), (d80, d80))
     utime(join(temp_dir, "bob/INPUT/data-3.csv"), (d30, d30))
@@ -41,7 +41,7 @@ def ftp_dir(temp_dir):
     utime(join(temp_dir, "alice/INPUT/domain/feed/2049_feed.xml"), (d600, d600))
     utime(join(temp_dir, "alice/INPUT/eicar.com.txt"), (d10, d10))
     utime(join(temp_dir, "alice/INPUT/lorem.txt"), (d10, d10))
-    utime(join(temp_dir, "jose/ARCHIVE/oldie.txt"), (h48, h48))
+    utime(join(temp_dir, "jose/ARCHIVE/oldie.txt"), (h80, h80))
 
     return temp_dir
 

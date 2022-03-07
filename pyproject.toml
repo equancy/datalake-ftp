@@ -1,5 +1,11 @@
 [tool.poetry]
 authors = ["Didier SCHMITT <dschmitt@equancy.com>"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Operating System :: POSIX",
+  "Topic :: Internet :: File Transfer Protocol (FTP)",
+]
 description = "Moves files from FTP drop folders to a Cloud Bucket"
 license = "MIT"
 name = "datalake-ftp"
@@ -39,8 +45,8 @@ ftpcloud = "datalake_ftp.cli:main"
 
 [tool.pytest.ini_options]
 addopts = "-ra -v --no-header"
+markers = [
+  "clamav: marks tests requiring a ClamAV daemon",
+]
 minversion = "6.0"
 testpaths = ["tests"]
-markers = [
-    "clamav: marks tests requiring a ClamAV daemon"
-]

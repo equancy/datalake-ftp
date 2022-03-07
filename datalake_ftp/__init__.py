@@ -37,7 +37,7 @@ class FTPCloud:
             "archive_folder": "ARCHIVE",
             "quarantine_folder": "QUARANTINE",
             "move_age_seconds": 180,
-            "archive_retention_hours": 24,
+            "archive_retention_hours": 72,
             "antivirus": {
                 "enabled": False,
                 "params": "",
@@ -155,11 +155,15 @@ class FTPCloud:
             self._services.monitor.safe_push(metric)
 
     def delta24(self):
-        files_to_move = self.scan_folder(
+        archives_to_move = self.scan_folder(
             folder=self._config["archive_folder"],
             min_age=self._config["archive_retention_hours"] * 60 * 60,
         )
-        for file_to_move in files_to_move:
+        infects_to_move = self.scan_folder(
+            folder=self._config["quarantine_folder"],
+            min_age=self._config["archive_retention_hours"] * 60 * 60,
+        )
+        for file_to_move in archives_to_move + infects_to_move:
             try:
                 self._logger.info(f"Purging file {str(file_to_move)}")
                 (self._ftp_dir / file_to_move).unlink()
