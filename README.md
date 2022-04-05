@@ -31,6 +31,8 @@ Selected files are moved to the `LANDING` folder.
 2. **Optional** Scan files for malwares and viruses: all files in the `LANDING` folder are scanned with [ClamAV antivirus](https://www.clamav.net/).
 Infected files are moved to the `QUARANTINE` folder.
 
+> :warning: ClamAV antivirus only works on Linux.
+
 3. Copy files to the cloud bucket: all files in the `LANDING` folder are copied along with their subfolders in a target bucket. Files successfully copied are then moved to the `ARCHIVE` folder.
 
 4. Clean up files after retention period: all files older than 72 hours (according to last modification time) are removed from the folders `ARCHIVE` and `QUARANTINE`
@@ -74,7 +76,43 @@ WantedBy=multi-user.target
 ## Configuration
 
 Configuration file is in YAML format.
-the following options are available:
+
+Here is a sample configuration with **Azure BlobStorage**
+
+```yaml
+cloud: 
+  bucket: mystorageaccount.mycontainer
+  prefix: external/file-transfer
+  provider: azure
+  monitoring: 
+    class: NoMonitor
+    params:
+      quiet: no
+ftp_dir: /data/ftp/home
+drop_folder: INPUT
+deliver_folder: EXPORTING
+archive_folder: EXPORTED
+quarantine_folder: QUARANTINED
+```
+
+Another example using **GCS bucket** with an active antivirus
+
+```yaml
+cloud: 
+  bucket: my-bcs-bucket
+  prefix: ""
+  provider: gcp
+  monitoring: 
+    class: datalake.provider.gcp.GoogleMonitor
+    params:
+      project_id: my-project-id
+antivirus:
+  enabled: yes
+  params: "--fdpass"
+```
+
+
+The following options are available:
 
 
 | Option | Description | Default value |

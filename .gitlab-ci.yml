@@ -7,7 +7,12 @@ stages:
 pytest:
   stage: Python Test
   only:
-  - branches
+    changes:
+      - datalake_ftp/**/*
+      - pyproject.toml
+      - tests/**/*
+    refs:
+      - branches
   image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-datalake-ftp:220301
   variables:
     CLAMAV_NO_CLAMD: "false"
@@ -26,7 +31,11 @@ pytest:
 python-build:
   stage: Python Build
   only:
-  - tags
+    changes:
+      - datalake_ftp/**/*
+      - pyproject.toml
+    refs:
+      - tags
   image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
   script:
   - poetry build --quiet
@@ -38,7 +47,11 @@ python-build:
 nexus-release:
   stage: Python Release
   only:
-  - tags
+    changes:
+      - datalake_ftp/**/*
+      - pyproject.toml
+    refs:
+      - tags
   image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
   script:
   - poetry config repositories.equancy https://nexus.apps.equancy.cloud/repository/equancy-python/
@@ -52,7 +65,11 @@ nexus-release:
 pypi-release:
   stage: Python Release
   only:
-  - tags
+    changes:
+      - datalake_ftp/**/*
+      - pyproject.toml
+    refs:
+      - tags
   image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
   script:
   - poetry publish -u "${PYPI_USER}" -p "${PYPI_PASSWORD}"
