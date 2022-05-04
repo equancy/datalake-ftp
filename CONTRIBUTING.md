@@ -1,15 +1,6 @@
 
 ## Unit testing
 
-launch a clamav server on port 3310
-
-```shell
-docker run --rm -d \
-    --name clamav \
-    -p 3310:3310 \
-    public.ecr.aws/equancy-tech/datalake-catalog:1.0.0
-```
-
 ```shell
 export AWS_PROFILE='equancy-lab'
 

@@ -1,7 +1,6 @@
 ---
 stages:
 - Python Test
-- Python Build
 - Python Release
 
 pytest:
@@ -9,7 +8,6 @@ pytest:
   only:
     changes:
       - datalake_ftp/**/*
-      - pyproject.toml
       - tests/**/*
     refs:
       - branches
@@ -21,59 +19,17 @@ pytest:
   services:
     - alias: clamav
       name: clamav/clamav:0.104.0
-
   before_script:
   - poetry install --quiet
   script:
   - poetry run coverage run -m pytest -q --color=no
   - poetry run coverage report -m
 
-python-build:
-  stage: Python Build
-  only:
-    changes:
-      - datalake_ftp/**/*
-      - pyproject.toml
-    refs:
-      - tags
-  image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
-  script:
-  - poetry build --quiet
-  cache:
-    paths:
-    - dist
-    policy: push
-
-nexus-release:
-  stage: Python Release
-  only:
-    changes:
-      - datalake_ftp/**/*
-      - pyproject.toml
-    refs:
-      - tags
-  image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
-  script:
-  - poetry config repositories.equancy https://nexus.apps.equancy.cloud/repository/equancy-python/
-  - poetry config http-basic.equancy ${NEXUS_USER} ${NEXUS_PASSWORD}
-  - poetry publish -r equancy
-  cache:
-    paths:
-    - dist
-    policy: pull
-
 pypi-release:
   stage: Python Release
   only:
-    changes:
-      - datalake_ftp/**/*
-      - pyproject.toml
-    refs:
-      - tags
-  image: 641143039263.dkr.ecr.eu-west-3.amazonaws.com/runner/ci-python:3.8
+  - tags
+  image: public.ecr.aws/equancy-tech/ci-python:3.8
   script:
+  - poetry build --quiet
   - poetry publish -u "${PYPI_USER}" -p "${PYPI_PASSWORD}"
-  cache:
-    paths:
-    - dist
-    policy: pull

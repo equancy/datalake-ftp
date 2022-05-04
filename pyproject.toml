@@ -10,7 +10,7 @@ description = "Moves files from FTP drop folders to a Cloud Bucket"
 license = "MIT"
 name = "datalake-ftp"
 readme = "README.md"
-repository = "https://git.equancy.cloud/equancy/data-technologies/datalake-ftp"
+repository = "https://github.com/equancy/datalake-ftp"
 version = "1.0.2"
 
 [tool.poetry.dependencies]
