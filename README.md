@@ -36,7 +36,29 @@ Infected files are moved to the `QUARANTINE` folder.
 3. Copy files to the cloud bucket: all files in the `LANDING` folder are copied along with their subfolders in a target bucket. Files successfully copied are then moved to the `ARCHIVE` folder.
 
 4. Clean up files after retention period: all files older than 72 hours (according to last modification time) are removed from the folders `ARCHIVE` and `QUARANTINE`
-     
+
+
+## Folder permissions
+
+`ftpcloud` needs permissions to scan `INPUT` folders across all ftp users and needs permissions to move files from one subfolder to another.
+
+Here is a working example of user/group permission setup
+
+First, create a user for `ftpcloud` command
+
+```shell
+sudo useradd -s /bin/bash -g sftp -m -N -c "Datalake Transfer Agent" datalake
+```
+
+Then, create a FTP user folders with the following permissions
+
+```shell
+sudo mkdir -m 0775 INPUT/
+sudo chown ${MY_USER}:sftp INPUT/
+
+sudo mkdir -m 0755 LANDING/ ARCHIVE/ QUARANTINE/
+sudo chown datalake:sftp LANDING/ ARCHIVE/ QUARANTINE/
+```
 
 ## Installation
 
