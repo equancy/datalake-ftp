@@ -115,6 +115,7 @@ drop_folder: INPUT
 deliver_folder: EXPORTING
 archive_folder: EXPORTED
 quarantine_folder: QUARANTINED
+target_template: "FTP-{user}/{folder}/{date}_{filename}"
 ```
 
 Another example using **GCS bucket** with an active antivirus
@@ -146,9 +147,18 @@ The following options are available:
 | `quarantine_folder` | The name for the `QUARANTINE` folder | "QUARANTINE" |
 | `move_age_seconds` | The age threshold in seconds for selecting files for synchronization | 180 |
 | `archive_retention_hours` | The retention period in hours for archived and quarantined files | 72 |
+| `target_template` | The template string for generating the target path in the bucket | "{fullpath}" |
 | `cloud.bucket` | The name of the target bucket | "." |
 | `cloud.prefix` | The prefix to append to file names before copying to the bucket. | "" |
 | `cloud.provider` | The cloud provider for the bucket (either "aws", "gcp", "azure" or "local")| "local" |
 | `cloud.monitoring` | The monitoring configuration | `NoMonitor` |
 | `antivirus.enabled` | The flag to enable antivirus scanning | `false` |
 | `antivirus.params` | Optional arguments to pass to `clamdscan` command | "" |
+
+The placeholders for templating `target_template` are
+
+- **fullpath**: the exact input path
+- **user**: the username part from the input path
+- **folder**: the subfolders relative to `deliver_folder` from the input path
+- **filename**: the filename part from the input path
+- **date**: the current day in ISO-8601 format

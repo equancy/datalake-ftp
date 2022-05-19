@@ -38,6 +38,7 @@ class FTPCloud:
             "quarantine_folder": "QUARANTINE",
             "move_age_seconds": 180,
             "archive_retention_hours": 72,
+            "target_template": "{fullpath}",
             "antivirus": {
                 "enabled": False,
                 "params": "",
@@ -91,6 +92,23 @@ class FTPCloud:
         source_path = self.full_path(src_path)
         shutil.move(str(source_path), str(target_path))
 
+    def target_path(self, src_path):
+        src_parts = src_path.parts
+        params = {
+            "fullpath": str(src_path),
+            "user": src_parts[0],
+            "folder": str(Path(*src_parts[2:-1])) if len(src_parts) > 3 else "",
+            "filename": src_path.name,
+            "date": pendulum.now().to_date_string()
+        }
+        target_path = Path(self._config["target_template"].format(**params))
+        # Ignore absolute paths
+        if target_path.is_absolute():
+            target_path = Path(*target_path.parts[1:])
+        # Resolve empty subfolers
+        target_path = target_path.resolve(False).relative_to(Path.cwd())
+        return str(target_path)
+
     def delta3(self):
         files_to_move = self.scan_folder(folder=self._config["drop_folder"], min_age=self._config["move_age_seconds"])
         for file_to_move in files_to_move:
@@ -135,9 +153,8 @@ class FTPCloud:
 
                 if is_safe:
                     bucket = self._services.get_storage(self._config["cloud"]["bucket"])
-                    if self._config["cloud"]["prefix"] is None:  # pragma: no cover
-                        target_path = str(file_to_move)
-                    else:
+                    target_path = self.target_path(file_to_move)
+                    if self._config["cloud"]["prefix"] is not None:  # pragma: no cover
                         target_path = join(self._config["cloud"]["prefix"], str(file_to_move))
                     bucket.upload(
                         src=str(self.full_path(file_to_move)),

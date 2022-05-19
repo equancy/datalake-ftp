@@ -8,6 +8,7 @@ from tempfile import mkdtemp
 from pendulum import now
 from uuid import uuid4
 from datalake.provider.aws import Storage
+from copy import deepcopy
 
 S3_BUCKET = "eqlab-datamock-ephemeral"
 
@@ -47,8 +48,8 @@ def ftp_dir(temp_dir):
 
 
 @pytest.fixture(scope="module")
-def ftp_cloud(ftp_dir, test_id):
-    config = {
+def base_config(ftp_dir, test_id):
+    return {
         "cloud": {
             "bucket": S3_BUCKET,
             "prefix": f"ftp-{test_id}",
@@ -62,28 +63,17 @@ def ftp_cloud(ftp_dir, test_id):
         },
         "ftp_dir": ftp_dir,
     }
-
-    return FTPCloud(config)
 
 
 @pytest.fixture(scope="module")
-def ftp_cloudav(ftp_dir, test_id):
-    config = {
-        "cloud": {
-            "bucket": S3_BUCKET,
-            "prefix": f"ftp-{test_id}",
-            "provider": "aws",
-            "monitoring": {
-                "class": "NoMonitor",
-                "params": {
-                    "quiet": False,
-                },
-            },
-        },
-        "ftp_dir": ftp_dir,
-        "antivirus": {"enabled": True, "params": "--config-file tests/clamd.conf --stream"},
-    }
+def ftp_cloud(base_config):
+    return FTPCloud(base_config)
 
+
+@pytest.fixture(scope="module")
+def ftp_cloudav(base_config):
+    config = deepcopy(base_config)
+    config["antivirus"] = {"enabled": True, "params": "--config-file tests/clamd.conf --stream"}
     return FTPCloud(config)
 
 
@@ -127,6 +117,31 @@ def test_prepare(ftp_cloud):
     assert not (ftp_dir / Path("alice/INPUT/domain/feed/2049_feed.xml")).is_file()
     assert (ftp_dir / Path("alice/LANDING/domain/feed")).is_dir()
     assert (ftp_dir / Path("alice/LANDING/domain/feed/2049_feed.xml")).is_file()
+
+
+def test_template(base_config):
+    input_path1 = Path("alice/LANDING/domain/feed/2049_feed.xml")
+    input_path2 = Path("bob/LANDING/data-3.csv")
+    today = now().to_date_string()
+    config = deepcopy(base_config)
+
+    # By default the target path matches the input path
+    ftp_cloud = FTPCloud(config)
+    assert ftp_cloud.target_path(input_path1) == str(input_path1)
+
+    config["target_template"] = "{user}/{folder}/{date}/{filename}"
+    ftp_cloud = FTPCloud(config)
+    assert ftp_cloud.target_path(input_path1) == f"alice/domain/feed/{today}/2049_feed.xml"
+    # Empty subfolders are removed
+    assert ftp_cloud.target_path(input_path2) == f"bob/{today}/data-3.csv"
+    # Absolute template is ignored
+    config["target_template"] = "/landing/{folder}/{user}/{filename}"
+    ftp_cloud = FTPCloud(config)
+    assert ftp_cloud.target_path(input_path2) == f"landing/bob/data-3.csv"
+    
+    config["target_template"] = "static_file.txt"
+    ftp_cloud = FTPCloud(config)
+    assert ftp_cloud.target_path(input_path1) == "static_file.txt"
 
 
 def test_delta3(ftp_cloud):
